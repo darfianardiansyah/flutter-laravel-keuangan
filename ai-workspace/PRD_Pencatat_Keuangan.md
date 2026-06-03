@@ -38,7 +38,8 @@
 14. [Spesifikasi API Lengkap](#14-spesifikasi-api-lengkap)
 15. [Validasi & Error Handling](#15-validasi--error-handling)
 16. [Aturan Bisnis](#16-aturan-bisnis)
-17. [Kriteria Penerimaan](#17-kriteria-penerimaan)
+17. [Fitur v1.1 — Statistik Bulanan](#17-fitur-v11--statistik-bulanan)
+18. [Kriteria Penerimaan](#18-kriteria-penerimaan)
 
 ---
 
@@ -55,11 +56,18 @@ Aplikasi mobile untuk mencatat pemasukan dan pengeluaran pribadi. Pengguna dapat
 - Kartu ringkasan: saldo, total pemasukan, total pengeluaran
 
 ### Yang TIDAK dibangun di v1.0
-- Grafik/chart visualisasi
+- Grafik/chart visualisasi (dipindahkan ke rencana v1.1)
 - Notifikasi push
 - Ekspor PDF/Excel
 - Fitur offline-first
 - Multi-akun
+
+### Rencana Fitur v1.1
+- Statistik bulanan dalam bentuk pie chart
+- Pie chart pemasukan berdasarkan kategori
+- Pie chart pengeluaran berdasarkan kategori
+- Detail nominal dan persentase per kategori
+- Filter statistik mengikuti bulan yang dipilih user
 
 ---
 
@@ -1806,7 +1814,265 @@ try {
 
 ---
 
-## 17. Kriteria Penerimaan
+## 17. Fitur v1.1 — Statistik Bulanan
+
+### 17.1 Tujuan
+
+Menambahkan halaman statistik bulanan agar user dapat melihat komposisi pemasukan dan pengeluaran berdasarkan kategori. Statistik ditampilkan dalam bentuk pie chart dan daftar detail per kategori berupa nominal, jumlah transaksi, dan persentase kontribusi terhadap total tipe transaksi tersebut.
+
+### 17.2 Ruang Lingkup
+
+Fitur statistik v1.1 mencakup:
+
+- Statistik berdasarkan bulan aktif dengan format filter `yyyy-MM`
+- Pie chart pemasukan per kategori
+- Pie chart pengeluaran per kategori
+- Detail kategori yang menampilkan nama kategori, nominal total, jumlah transaksi, dan persentase
+- Empty state jika belum ada data pada bulan yang dipilih
+- Pull-to-refresh untuk memuat ulang statistik
+
+Fitur statistik v1.1 tidak mencakup:
+
+- Grafik tren harian/mingguan
+- Perbandingan antar bulan
+- Export statistik ke PDF/Excel
+- Drill-down sampai daftar transaksi per kategori
+
+### 17.3 Backend Laravel — Endpoint Statistik
+
+Tambahkan method baru pada `app/Http/Controllers/Api/TransactionController.php`:
+
+```php
+public function statistics(Request $request): JsonResponse
+```
+
+Endpoint:
+
+```http
+GET /api/transactions/statistics?month=yyyy-MM
+```
+
+Route harus didaftarkan sebelum `Route::apiResource('transactions', TransactionController::class)` agar tidak bentrok dengan `{transaction}`:
+
+```php
+Route::get('/transactions/statistics', [TransactionController::class, 'statistics']);
+```
+
+Query:
+
+| Parameter | Wajib | Format | Keterangan |
+|---|---|---|---|
+| month | Tidak | `yyyy-MM` | Jika kosong, statistik menghitung semua transaksi user |
+
+Response 200:
+
+```json
+{
+  "data": {
+    "month": "2026-06",
+    "income": {
+      "total": 6000000.0,
+      "categories": [
+        {
+          "category": "Gaji",
+          "total": 5000000.0,
+          "count": 1,
+          "percentage": 83.33
+        },
+        {
+          "category": "Bonus",
+          "total": 1000000.0,
+          "count": 1,
+          "percentage": 16.67
+        }
+      ]
+    },
+    "expense": {
+      "total": 1250000.0,
+      "categories": [
+        {
+          "category": "Makanan",
+          "total": 750000.0,
+          "count": 20,
+          "percentage": 60.0
+        },
+        {
+          "category": "Transportasi",
+          "total": 500000.0,
+          "count": 12,
+          "percentage": 40.0
+        }
+      ]
+    }
+  }
+}
+```
+
+Aturan perhitungan:
+
+- Statistik hanya menghitung transaksi milik user yang sedang login.
+- Jika `month` dikirim, statistik hanya menghitung transaksi pada bulan tersebut.
+- Kategori dihitung terpisah untuk `income` dan `expense`.
+- `percentage = total kategori / total tipe transaksi * 100`.
+- Jika total tipe transaksi adalah 0, `percentage` setiap kategori harus 0 dan array kategori kosong.
+- Persentase dibulatkan maksimal 2 angka desimal.
+- Urutan kategori berdasarkan `total` terbesar ke terkecil.
+
+### 17.4 Frontend Flutter — Dependency
+
+Tambahkan dependency chart ke `keuangan_app/pubspec.yaml`:
+
+```yaml
+dependencies:
+  fl_chart: ^0.69.0
+```
+
+Setelah edit, jalankan:
+
+```bash
+flutter pub get
+```
+
+### 17.5 Frontend Flutter — Struktur File Baru
+
+Tambahkan file berikut:
+
+```text
+keuangan_app/
+└── lib/
+    ├── models/
+    │   └── category_stat.dart
+    ├── screens/
+    │   └── statistics_screen.dart
+    └── widgets/
+        ├── category_pie_chart.dart
+        └── category_stat_tile.dart
+```
+
+### 17.6 Frontend Flutter — Model Statistik
+
+File: `lib/models/category_stat.dart`
+
+Model minimal:
+
+```dart
+class CategoryStat {
+  final String category;
+  final double total;
+  final int count;
+  final double percentage;
+
+  CategoryStat({
+    required this.category,
+    required this.total,
+    required this.count,
+    required this.percentage,
+  });
+
+  factory CategoryStat.fromJson(Map<String, dynamic> json) {
+    return CategoryStat(
+      category: json['category'],
+      total: double.parse(json['total'].toString()),
+      count: int.parse(json['count'].toString()),
+      percentage: double.parse(json['percentage'].toString()),
+    );
+  }
+}
+```
+
+### 17.7 Frontend Flutter — API Service
+
+Tambahkan method baru di `lib/services/api_service.dart`:
+
+```dart
+Future<Map<String, List<CategoryStat>>> getStatistics({String? month})
+```
+
+Return map harus memiliki key:
+
+```text
+income
+expense
+```
+
+Masing-masing key berisi daftar `CategoryStat`.
+
+### 17.8 Frontend Flutter — StatisticsScreen
+
+File: `lib/screens/statistics_screen.dart`
+
+Spesifikasi UI:
+
+- AppBar title: `Statistik Bulanan`
+- Menampilkan bulan aktif dalam format `MMMM yyyy`
+- Tombol filter bulan menggunakan date picker
+- Tab atau segmented control untuk berpindah antara `Pemasukan` dan `Pengeluaran`
+- Pie chart menampilkan komposisi kategori berdasarkan mode aktif
+- Di bawah pie chart tampil daftar detail kategori
+- Setiap item detail kategori menampilkan:
+  - nama kategori
+  - total nominal Rupiah
+  - jumlah transaksi
+  - persentase, contoh `35.5%`
+- Empty state:
+  - Jika pemasukan kosong: `Belum ada data pemasukan bulan ini.`
+  - Jika pengeluaran kosong: `Belum ada data pengeluaran bulan ini.`
+- Pull-to-refresh memuat ulang statistik
+- Error API tampil sebagai SnackBar merah
+
+### 17.9 Frontend Flutter — CategoryPieChart
+
+File: `lib/widgets/category_pie_chart.dart`
+
+Spesifikasi:
+
+- Menggunakan `fl_chart`
+- Input: `List<CategoryStat>`
+- Setiap kategori menjadi satu slice pie
+- Slice menampilkan persentase jika nilainya cukup besar
+- Warna kategori harus konsisten antara chart dan daftar detail
+- Jika data kosong, widget menampilkan empty state, bukan chart kosong
+
+### 17.10 Frontend Flutter — Navigasi
+
+Tambahkan tombol akses statistik dari `HomeScreen`.
+
+Rekomendasi:
+
+- Tambahkan `IconButton` di `AppBar` dengan ikon `Icons.pie_chart_outline`
+- Tooltip: `Statistik`
+- Tap tombol membuka `StatisticsScreen`
+
+### 17.11 Kriteria Penerimaan v1.1
+
+Backend:
+
+- [ ] `GET /api/transactions/statistics` wajib auth Sanctum
+- [ ] Endpoint mengembalikan 401 jika tidak ada token
+- [ ] Endpoint hanya menghitung transaksi milik user login
+- [ ] Endpoint mendukung filter `?month=yyyy-MM`
+- [ ] Endpoint mengelompokkan pemasukan berdasarkan kategori
+- [ ] Endpoint mengelompokkan pengeluaran berdasarkan kategori
+- [ ] Persentase kategori akurat dan total persentase mendekati 100% per tipe transaksi
+- [ ] Kategori diurutkan dari nominal terbesar ke terkecil
+- [ ] Test backend dibuat untuk statistik pemasukan dan pengeluaran
+
+Frontend:
+
+- [ ] `flutter pub get` berhasil setelah menambah `fl_chart`
+- [ ] `flutter analyze` tidak memiliki issue
+- [ ] HomeScreen memiliki tombol menuju StatisticsScreen
+- [ ] StatisticsScreen menampilkan pie chart pemasukan per kategori
+- [ ] StatisticsScreen menampilkan pie chart pengeluaran per kategori
+- [ ] User dapat mengganti mode pemasukan/pengeluaran
+- [ ] User dapat mengganti bulan statistik
+- [ ] Detail kategori menampilkan nominal, jumlah transaksi, dan persentase
+- [ ] Empty state tampil jika tidak ada data
+- [ ] Error API tampil sebagai SnackBar merah
+
+---
+
+## 18. Kriteria Penerimaan
 
 AI Agent dinyatakan selesai jika seluruh poin berikut terpenuhi:
 
@@ -1881,4 +2147,4 @@ Catatan blokir:
 
 ---
 
-*Setelah semua kriteria terpenuhi, aplikasi v1.0 siap digunakan dan siap dikembangkan ke fitur v1.1 (grafik & pencarian).*
+*Setelah semua kriteria v1.0 terpenuhi, aplikasi siap digunakan dan dapat dilanjutkan ke fitur v1.1 statistik bulanan. Fitur pencarian dapat direncanakan pada versi berikutnya.*

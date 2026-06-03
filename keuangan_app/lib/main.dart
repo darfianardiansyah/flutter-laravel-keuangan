@@ -1,6 +1,13 @@
 import 'package:flutter/material.dart';
+import 'package:intl/date_symbol_data_local.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
-void main() {
+import 'screens/home_screen.dart';
+import 'screens/login_screen.dart';
+
+void main() async {
+  WidgetsFlutterBinding.ensureInitialized();
+  await initializeDateFormatting('id', null);
   runApp(const MyApp());
 }
 
@@ -16,9 +23,42 @@ class MyApp extends StatelessWidget {
         colorSchemeSeed: Colors.indigo,
         useMaterial3: true,
       ),
-      home: const Scaffold(
-        body: Center(child: CircularProgressIndicator()),
+      home: const _SplashDecider(),
+    );
+  }
+}
+
+class _SplashDecider extends StatefulWidget {
+  const _SplashDecider();
+
+  @override
+  State<_SplashDecider> createState() => _SplashDeciderState();
+}
+
+class _SplashDeciderState extends State<_SplashDecider> {
+  @override
+  void initState() {
+    super.initState();
+    _decide();
+  }
+
+  Future<void> _decide() async {
+    final prefs = await SharedPreferences.getInstance();
+    final token = prefs.getString('token');
+
+    if (!mounted) return;
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (_) => token == null ? const LoginScreen() : const HomeScreen(),
       ),
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return const Scaffold(
+      body: Center(child: CircularProgressIndicator()),
     );
   }
 }

@@ -4,6 +4,7 @@ import 'package:intl/intl.dart';
 import '../models/transaction.dart';
 import '../services/api_service.dart';
 
+// Form untuk tambah transaksi baru atau edit transaksi yang sudah ada.
 class FormScreen extends StatefulWidget {
   final Transaction? transaction;
 
@@ -24,8 +25,10 @@ class _FormScreenState extends State<FormScreen> {
   DateTime _date = DateTime.now();
   bool _loading = false;
 
+  // Mode edit aktif jika HomeScreen mengirim object transaksi.
   bool get _isEdit => widget.transaction != null;
 
+  // Pilihan kategori berubah mengikuti tipe transaksi.
   List<String> get _categories => _type == 'income'
       ? ['Gaji', 'Bonus', 'Investasi', 'Lainnya']
       : [
@@ -43,6 +46,7 @@ class _FormScreenState extends State<FormScreen> {
     super.initState();
     final transaction = widget.transaction;
     if (transaction != null) {
+      // Prefill field saat user membuka transaksi untuk diedit.
       _titleCtrl.text = transaction.title;
       _amountCtrl.text = transaction.amount.toStringAsFixed(0);
       _noteCtrl.text = transaction.note ?? '';
@@ -61,6 +65,7 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _save() async {
+    // Ambil input user dan normalisasi nominal sebelum dikirim ke API.
     final title = _titleCtrl.text.trim();
     final amount = double.tryParse(_amountCtrl.text.replaceAll('.', ''));
 
@@ -77,6 +82,7 @@ class _FormScreenState extends State<FormScreen> {
     setState(() => _loading = true);
 
     try {
+      // Object ini menjadi payload create/update transaksi.
       final transaction = Transaction(
         id: widget.transaction?.id ?? 0,
         title: title,
@@ -88,12 +94,15 @@ class _FormScreenState extends State<FormScreen> {
       );
 
       if (_isEdit) {
+        // Update memakai id transaksi lama.
         await _api.updateTransaction(transaction.id, transaction);
       } else {
+        // Create memakai id 0 karena id asli akan dibuat oleh backend.
         await _api.createTransaction(transaction);
       }
 
       if (!mounted) return;
+      // True memberi sinyal ke HomeScreen agar reload data.
       Navigator.pop(context, true);
     } catch (e) {
       _showError(e.toString().replaceFirst('Exception: ', ''));
@@ -103,6 +112,7 @@ class _FormScreenState extends State<FormScreen> {
   }
 
   Future<void> _pickDate() async {
+    // Date picker menjaga format input tanggal tetap valid.
     final picked = await showDatePicker(
       context: context,
       initialDate: _date,
@@ -117,6 +127,7 @@ class _FormScreenState extends State<FormScreen> {
 
   void _showError(String message) {
     if (!mounted) return;
+    // Error validasi form/API ditampilkan tanpa membuat app crash.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
@@ -134,6 +145,7 @@ class _FormScreenState extends State<FormScreen> {
           crossAxisAlignment: CrossAxisAlignment.stretch,
           children: [
             SegmentedButton<String>(
+              // Memilih apakah transaksi masuk sebagai pemasukan atau pengeluaran.
               segments: const [
                 ButtonSegment(
                   value: 'income',
@@ -148,6 +160,7 @@ class _FormScreenState extends State<FormScreen> {
               ],
               selected: {_type},
               onSelectionChanged: (value) => setState(() {
+                // Reset kategori agar tidak memakai kategori dari tipe sebelumnya.
                 _type = value.first;
                 _category = _categories.first;
               }),
@@ -172,6 +185,7 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
+              // Dropdown kategori mengikuti tipe transaksi yang sedang dipilih.
               initialValue: _categories.contains(_category)
                   ? _category
                   : _categories.first,
@@ -191,6 +205,7 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const SizedBox(height: 12),
             ListTile(
+              // Tanggal transaksi ditampilkan dalam format Indonesia.
               contentPadding: EdgeInsets.zero,
               leading: const Icon(Icons.calendar_today_outlined),
               title: Text(DateFormat('dd MMMM yyyy', 'id').format(_date)),
@@ -199,6 +214,7 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const Divider(),
             TextField(
+              // Catatan bersifat opsional dan dikirim null jika kosong.
               controller: _noteCtrl,
               maxLines: 3,
               decoration: const InputDecoration(
@@ -208,6 +224,7 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const SizedBox(height: 20),
             FilledButton.icon(
+              // Tombol simpan disable saat request sedang berjalan.
               onPressed: _loading ? null : _save,
               icon: _loading
                   ? const SizedBox(

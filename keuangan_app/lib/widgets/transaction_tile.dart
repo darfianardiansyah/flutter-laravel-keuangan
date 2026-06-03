@@ -3,6 +3,7 @@ import 'package:intl/intl.dart';
 
 import '../models/transaction.dart';
 
+// Baris transaksi yang mendukung tap untuk edit dan swipe untuk hapus.
 class TransactionTile extends StatelessWidget {
   final Transaction transaction;
   final VoidCallback onEdit;
@@ -15,6 +16,7 @@ class TransactionTile extends StatelessWidget {
     required this.onDelete,
   });
 
+  // Mapping kategori ke ikon agar daftar transaksi lebih mudah dipindai.
   static const _icons = <String, IconData>{
     'Makanan': Icons.restaurant,
     'Transportasi': Icons.directions_car,
@@ -30,6 +32,7 @@ class TransactionTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    // Warna dan tanda nominal mengikuti tipe income/expense.
     final isIncome = transaction.isIncome;
     final currency = NumberFormat.currency(
       locale: 'id',
@@ -40,6 +43,7 @@ class TransactionTile extends StatelessWidget {
         .format(DateTime.parse(transaction.date));
 
     return Dismissible(
+      // Swipe kiri menampilkan aksi hapus dengan konfirmasi dialog.
       key: Key('transaction-${transaction.id}'),
       direction: DismissDirection.endToStart,
       background: Container(
@@ -49,6 +53,7 @@ class TransactionTile extends StatelessWidget {
         child: const Icon(Icons.delete, color: Colors.white),
       ),
       confirmDismiss: (_) async {
+        // Konfirmasi mencegah transaksi terhapus tanpa sengaja.
         return await showDialog<bool>(
           context: context,
           builder: (_) => AlertDialog(
@@ -72,6 +77,7 @@ class TransactionTile extends StatelessWidget {
       },
       onDismissed: (_) => onDelete(),
       child: ListTile(
+        // Icon kategori membantu membedakan transaksi tanpa membaca penuh.
         leading: CircleAvatar(
           backgroundColor:
               isIncome ? Colors.green.shade50 : Colors.red.shade50,
@@ -105,6 +111,7 @@ class TransactionTile extends StatelessWidget {
               ),
             ),
             if (transaction.note != null && transaction.note!.isNotEmpty)
+              // Ikon catatan memberi sinyal ada detail tambahan.
               const Icon(Icons.note_outlined, size: 12, color: Colors.grey),
           ],
         ),

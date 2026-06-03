@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:intl/intl.dart';
 
+// Kartu ringkasan saldo, total pemasukan, dan total pengeluaran bulan aktif.
 class SummaryCard extends StatelessWidget {
   final double balance;
   final double income;
@@ -13,6 +14,7 @@ class SummaryCard extends StatelessWidget {
     required this.expense,
   });
 
+  // Format angka menjadi Rupiah tanpa desimal.
   String _format(double value) {
     return NumberFormat.currency(
       locale: 'id',
@@ -27,6 +29,7 @@ class SummaryCard extends StatelessWidget {
       width: double.infinity,
       padding: const EdgeInsets.all(20),
       decoration: BoxDecoration(
+        // Gradient membedakan area ringkasan dari daftar transaksi.
         gradient: const LinearGradient(
           colors: [Color(0xFF3F51B5), Color(0xFF5C6BC0)],
           begin: Alignment.topLeft,
@@ -54,6 +57,7 @@ class SummaryCard extends StatelessWidget {
           Row(
             children: [
               Expanded(
+                // Total pemasukan ditandai ikon hijau.
                 child: _SummaryItem(
                   icon: Icons.arrow_downward_rounded,
                   iconColor: Colors.greenAccent,
@@ -62,6 +66,7 @@ class SummaryCard extends StatelessWidget {
                 ),
               ),
               Expanded(
+                // Total pengeluaran ditandai ikon merah.
                 child: _SummaryItem(
                   icon: Icons.arrow_upward_rounded,
                   iconColor: Colors.redAccent,
@@ -77,6 +82,7 @@ class SummaryCard extends StatelessWidget {
   }
 }
 
+// Item kecil yang dipakai ulang untuk pemasukan dan pengeluaran.
 class _SummaryItem extends StatelessWidget {
   final IconData icon;
   final Color iconColor;

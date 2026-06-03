@@ -1810,37 +1810,66 @@ try {
 
 AI Agent dinyatakan selesai jika seluruh poin berikut terpenuhi:
 
+### Status Progres per 2026-06-03
+
+Ringkasan tahapan yang sudah dilakukan:
+
+- [x] Backend Laravel berhasil dibuat di `keuangan-backend/`.
+- [x] Laravel Sanctum berhasil dipasang untuk autentikasi Bearer Token.
+- [x] Model `Transaction`, relasi `User::transactions()`, migration transaksi, controller auth, controller transaksi, dan route API sudah dibuat.
+- [x] Test backend sudah dibuat di `keuangan-backend/tests/Feature/FinanceApiTest.php`.
+- [x] Test backend terakhir lulus: `7 passed (40 assertions)`.
+- [x] Struktur Flutter berhasil dibuat di `keuangan_app/`.
+- [x] File Flutter utama sudah dibuat: model, API service, login/register screen, home screen, form screen, summary card, dan transaction tile.
+- [ ] Verifikasi Flutter belum dilakukan karena Flutter CLI belum tersedia di PATH.
+- [ ] Integrasi mobile ke Laravel belum diuji langsung karena proses dihentikan sampai Flutter CLI tersedia.
+
+Commit tahapan yang sudah dibuat:
+
+- `5af98b7 chore(backend): siapkan project laravel`
+- `6cbff33 feat(backend): tambah api transaksi dan autentikasi`
+- `eb7d44c test(backend): tambah pengujian api keuangan`
+- `8b57605 chore(frontend): siapkan struktur flutter`
+- `8c0939f feat(frontend): tambah alur pencatat keuangan`
+- `0788eea docs: tambah panduan menjalankan project`
+
+Catatan blokir:
+
+- Perintah `flutter --version` gagal karena `flutter` belum dikenali sebagai command.
+- Perintah `dart --version` juga belum tersedia.
+- Tahap berikutnya setelah Flutter CLI tersedia: jalankan `flutter pub get`, `flutter analyze`, dan `flutter run`; perbaiki jika ada error, lalu commit hasilnya sesuai `CommitGuidelines.md`.
+
 ### Backend Laravel
-- [ ] Migration `create_transactions_table` berhasil dijalankan tanpa error
-- [ ] `POST /api/register` membuat user baru dan mengembalikan token
-- [ ] `POST /api/login` mengembalikan token jika kredensial benar, 422 jika salah
-- [ ] `POST /api/logout` menghapus token aktif
-- [ ] `GET /api/transactions` mengembalikan hanya transaksi milik user yang login
-- [ ] `GET /api/transactions?month=yyyy-MM` memfilter transaksi berdasarkan bulan
-- [ ] `GET /api/transactions/summary` mengembalikan income, expense, balance yang akurat
-- [ ] `POST /api/transactions` membuat transaksi baru dengan validasi lengkap
-- [ ] `PUT /api/transactions/{id}` mengembalikan 403 jika bukan milik user
-- [ ] `DELETE /api/transactions/{id}` mengembalikan 403 jika bukan milik user
-- [ ] Semua endpoint terproteksi mengembalikan 401 tanpa token
+- [x] Migration `create_transactions_table` berhasil dijalankan tanpa error di test environment
+- [x] `POST /api/register` membuat user baru dan mengembalikan token
+- [x] `POST /api/login` mengembalikan token jika kredensial benar, 422 jika salah
+- [x] `POST /api/logout` menghapus token aktif
+- [x] `GET /api/transactions` mengembalikan hanya transaksi milik user yang login
+- [x] `GET /api/transactions?month=yyyy-MM` memfilter transaksi berdasarkan bulan
+- [x] `GET /api/transactions/summary` mengembalikan income, expense, balance yang akurat
+- [x] `POST /api/transactions` membuat transaksi baru dengan validasi lengkap
+- [x] `PUT /api/transactions/{id}` mengembalikan 403 jika bukan milik user
+- [x] `DELETE /api/transactions/{id}` mengembalikan 403 jika bukan milik user
+- [x] Semua endpoint terproteksi mengembalikan 401 tanpa token
 
 ### Frontend Flutter
-- [ ] Aplikasi langsung ke HomeScreen jika token tersimpan, ke LoginScreen jika tidak
-- [ ] Login berhasil menyimpan token dan berpindah ke HomeScreen
-- [ ] Logout menghapus token dan kembali ke LoginScreen
-- [ ] HomeScreen menampilkan SummaryCard dan daftar transaksi bulan berjalan
-- [ ] Ganti bulan memperbarui daftar dan ringkasan
-- [ ] Pull-to-refresh memuat ulang data
-- [ ] FAB membuka FormScreen kosong
-- [ ] Tap item transaksi membuka FormScreen dengan data prefill
-- [ ] Swipe kiri → konfirmasi → hapus transaksi dari daftar
-- [ ] Form menolak submit jika keterangan atau nominal kosong
-- [ ] Semua error API ditampilkan sebagai SnackBar merah, bukan crash
+- [ ] Aplikasi langsung ke HomeScreen jika token tersimpan, ke LoginScreen jika tidak (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Login berhasil menyimpan token dan berpindah ke HomeScreen (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Logout menghapus token dan kembali ke LoginScreen (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] HomeScreen menampilkan SummaryCard dan daftar transaksi bulan berjalan (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Ganti bulan memperbarui daftar dan ringkasan (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Pull-to-refresh memuat ulang data (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] FAB membuka FormScreen kosong (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Tap item transaksi membuka FormScreen dengan data prefill (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Swipe kiri → konfirmasi → hapus transaksi dari daftar (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Form menolak submit jika keterangan atau nominal kosong (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Semua error API ditampilkan sebagai SnackBar merah, bukan crash (kode dibuat, belum diverifikasi Flutter CLI)
 
 ### Integrasi
-- [ ] Flutter dapat berkomunikasi dengan Laravel yang berjalan di `localhost:8000`
-- [ ] Data yang ditambah via Flutter langsung muncul setelah refresh
-- [ ] Nominal ditampilkan dalam format Rupiah (`Rp 25.000`)
-- [ ] Tanggal ditampilkan dalam format yang terbaca (`03 Juni 2026`)
+- [ ] Flutter dapat berkomunikasi dengan Laravel yang berjalan di `localhost:8000` (belum diuji karena Flutter CLI belum tersedia)
+- [ ] Data yang ditambah via Flutter langsung muncul setelah refresh (belum diuji karena Flutter CLI belum tersedia)
+- [ ] Nominal ditampilkan dalam format Rupiah (`Rp 25.000`) (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Tanggal ditampilkan dalam format yang terbaca (`03 Juni 2026`) (kode dibuat, belum diverifikasi Flutter CLI)
 
 ---
 

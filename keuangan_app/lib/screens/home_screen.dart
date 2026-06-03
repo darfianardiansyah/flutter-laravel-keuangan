@@ -7,6 +7,7 @@ import '../widgets/summary_card.dart';
 import '../widgets/transaction_tile.dart';
 import 'form_screen.dart';
 import 'login_screen.dart';
+import 'statistics_screen.dart';
 
 // Dashboard utama untuk ringkasan bulanan dan daftar transaksi.
 class HomeScreen extends StatefulWidget {
@@ -94,6 +95,14 @@ class _HomeScreenState extends State<HomeScreen> {
     }
   }
 
+  void _openStatistics() {
+    // Membuka halaman statistik bulanan dari dashboard.
+    Navigator.push(
+      context,
+      MaterialPageRoute(builder: (_) => const StatisticsScreen()),
+    );
+  }
+
   Future<void> _deleteTransaction(Transaction transaction) async {
     try {
       // Delete dipanggil setelah konfirmasi dari TransactionTile.
@@ -141,6 +150,12 @@ class _HomeScreenState extends State<HomeScreen> {
       appBar: AppBar(
         title: const Text('Pencatat Keuangan'),
         actions: [
+          IconButton(
+            // Shortcut ke pie chart statistik kategori.
+            onPressed: _openStatistics,
+            icon: const Icon(Icons.pie_chart_outline),
+            tooltip: 'Statistik',
+          ),
           IconButton(
             // Shortcut filter bulan dari AppBar.
             onPressed: _selectMonth,

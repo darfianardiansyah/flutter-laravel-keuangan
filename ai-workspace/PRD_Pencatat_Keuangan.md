@@ -2047,28 +2047,36 @@ Rekomendasi:
 
 Backend:
 
-- [ ] `GET /api/transactions/statistics` wajib auth Sanctum
-- [ ] Endpoint mengembalikan 401 jika tidak ada token
-- [ ] Endpoint hanya menghitung transaksi milik user login
-- [ ] Endpoint mendukung filter `?month=yyyy-MM`
-- [ ] Endpoint mengelompokkan pemasukan berdasarkan kategori
-- [ ] Endpoint mengelompokkan pengeluaran berdasarkan kategori
-- [ ] Persentase kategori akurat dan total persentase mendekati 100% per tipe transaksi
-- [ ] Kategori diurutkan dari nominal terbesar ke terkecil
-- [ ] Test backend dibuat untuk statistik pemasukan dan pengeluaran
+- [x] `GET /api/transactions/statistics` wajib auth Sanctum
+- [x] Endpoint mengembalikan 401 jika tidak ada token
+- [x] Endpoint hanya menghitung transaksi milik user login
+- [x] Endpoint mendukung filter `?month=yyyy-MM`
+- [x] Endpoint mengelompokkan pemasukan berdasarkan kategori
+- [x] Endpoint mengelompokkan pengeluaran berdasarkan kategori
+- [x] Persentase kategori akurat dan total persentase mendekati 100% per tipe transaksi
+- [x] Kategori diurutkan dari nominal terbesar ke terkecil
+- [x] Test backend dibuat untuk statistik pemasukan dan pengeluaran
 
 Frontend:
 
-- [ ] `flutter pub get` berhasil setelah menambah `fl_chart`
-- [ ] `flutter analyze` tidak memiliki issue
-- [ ] HomeScreen memiliki tombol menuju StatisticsScreen
-- [ ] StatisticsScreen menampilkan pie chart pemasukan per kategori
-- [ ] StatisticsScreen menampilkan pie chart pengeluaran per kategori
-- [ ] User dapat mengganti mode pemasukan/pengeluaran
-- [ ] User dapat mengganti bulan statistik
-- [ ] Detail kategori menampilkan nominal, jumlah transaksi, dan persentase
-- [ ] Empty state tampil jika tidak ada data
-- [ ] Error API tampil sebagai SnackBar merah
+- [x] `flutter pub get` berhasil setelah menambah `fl_chart`
+- [x] `flutter analyze` tidak memiliki issue
+- [x] HomeScreen memiliki tombol menuju StatisticsScreen
+- [x] StatisticsScreen menampilkan pie chart pemasukan per kategori
+- [x] StatisticsScreen menampilkan pie chart pengeluaran per kategori
+- [x] User dapat mengganti mode pemasukan/pengeluaran
+- [x] User dapat mengganti bulan statistik
+- [x] Detail kategori menampilkan nominal, jumlah transaksi, dan persentase
+- [x] Empty state tampil jika tidak ada data
+- [x] Error API tampil sebagai SnackBar merah
+
+Status implementasi v1.1 per 2026-06-03:
+
+- [x] Backend endpoint statistik selesai.
+- [x] Backend test lulus: `9 passed (64 assertions)`.
+- [x] Frontend model, service, pie chart, detail kategori, dan layar statistik selesai.
+- [x] Flutter analyze lulus: `No issues found`.
+- [ ] Uji manual `flutter run` untuk statistik masih perlu dilakukan dengan backend aktif dan device/browser berjalan.
 
 ---
 

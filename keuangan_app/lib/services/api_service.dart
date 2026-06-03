@@ -1,5 +1,6 @@
 import 'dart:convert';
 
+import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
@@ -7,8 +8,15 @@ import '../models/transaction.dart';
 
 // Service pusat untuk semua komunikasi Flutter ke Laravel API.
 class ApiService {
-  // Base URL Android emulator ke localhost komputer host.
-  static const String baseUrl = 'http://10.0.2.2:8000/api';
+  // Base URL menyesuaikan target runtime:
+  // Android emulator memakai 10.0.2.2, desktop/web memakai localhost.
+  static String get baseUrl {
+    if (!kIsWeb && defaultTargetPlatform == TargetPlatform.android) {
+      return 'http://10.0.2.2:8000/api';
+    }
+
+    return 'http://127.0.0.1:8000/api';
+  }
 
   // Mengambil token Bearer yang tersimpan agar session tetap login.
   Future<String?> getToken() async {

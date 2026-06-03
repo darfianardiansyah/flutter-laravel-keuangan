@@ -4,6 +4,7 @@ import 'package:flutter/foundation.dart';
 import 'package:http/http.dart' as http;
 import 'package:shared_preferences/shared_preferences.dart';
 
+import '../models/category_stat.dart';
 import '../models/transaction.dart';
 
 // Service pusat untuk semua komunikasi Flutter ke Laravel API.
@@ -124,6 +125,30 @@ class ApiService {
       'income': double.parse(data['income'].toString()),
       'expense': double.parse(data['expense'].toString()),
       'balance': double.parse(data['balance'].toString()),
+    };
+  }
+
+  // Mengambil statistik kategori pemasukan dan pengeluaran untuk pie chart.
+  Future<Map<String, List<CategoryStat>>> getStatistics({String? month}) async {
+    final uri = Uri.parse('$baseUrl/transactions/statistics').replace(
+      queryParameters: month == null ? null : {'month': month},
+    );
+    final response = await http.get(uri, headers: await _authHeaders());
+    final body = _decode(response);
+
+    _throwIfFailed(response.statusCode, body);
+
+    final data = body['data'];
+    final incomeCategories = data['income']['categories'] as List;
+    final expenseCategories = data['expense']['categories'] as List;
+
+    return {
+      'income': incomeCategories
+          .map((item) => CategoryStat.fromJson(item))
+          .toList(),
+      'expense': expenseCategories
+          .map((item) => CategoryStat.fromJson(item))
+          .toList(),
     };
   }
 

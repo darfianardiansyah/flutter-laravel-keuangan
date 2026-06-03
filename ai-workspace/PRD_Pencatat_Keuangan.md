@@ -1821,8 +1821,12 @@ Ringkasan tahapan yang sudah dilakukan:
 - [x] Test backend terakhir lulus: `7 passed (40 assertions)`.
 - [x] Struktur Flutter berhasil dibuat di `keuangan_app/`.
 - [x] File Flutter utama sudah dibuat: model, API service, login/register screen, home screen, form screen, summary card, dan transaction tile.
-- [ ] Verifikasi Flutter belum dilakukan karena Flutter CLI belum tersedia di PATH.
-- [ ] Integrasi mobile ke Laravel belum diuji langsung karena proses dihentikan sampai Flutter CLI tersedia.
+- [x] Flutter CLI tersedia: Flutter 3.44.1 stable.
+- [x] `flutter pub get` berhasil dan `pubspec.lock` sudah dibuat.
+- [x] `flutter analyze` lulus: `No issues found`.
+- [x] Komentar `//` sudah ditambahkan pada kode Flutter untuk menjelaskan fungsi fitur dan method penting.
+- [ ] `flutter run` belum berhasil karena belum ada device Android/iOS terhubung.
+- [ ] Integrasi mobile ke Laravel belum diuji langsung karena belum ada device Android/iOS.
 
 Commit tahapan yang sudah dibuat:
 
@@ -1832,12 +1836,16 @@ Commit tahapan yang sudah dibuat:
 - `8b57605 chore(frontend): siapkan struktur flutter`
 - `8c0939f feat(frontend): tambah alur pencatat keuangan`
 - `0788eea docs: tambah panduan menjalankan project`
+- `448bbcd chore(frontend): kunci dependency flutter`
+- `9001f11 refactor(frontend): jelaskan alur core flutter`
+- `f07bfc9 refactor(frontend): jelaskan fitur auth dan dashboard`
+- `f5dd920 refactor(frontend): jelaskan fitur transaksi`
 
 Catatan blokir:
 
-- Perintah `flutter --version` gagal karena `flutter` belum dikenali sebagai command.
-- Perintah `dart --version` juga belum tersedia.
-- Tahap berikutnya setelah Flutter CLI tersedia: jalankan `flutter pub get`, `flutter analyze`, dan `flutter run`; perbaiki jika ada error, lalu commit hasilnya sesuai `CommitGuidelines.md`.
+- `flutter run` belum bisa dilanjutkan karena tidak ada device Android/iOS yang tersedia.
+- Device yang terdeteksi sebelumnya adalah Windows, Chrome, dan Edge, tetapi project belum dibuat untuk target desktop/web karena target PRD adalah Android dan iOS.
+- Tahap berikutnya: hubungkan emulator/device Android atau simulator iOS, jalankan Laravel di `localhost:8000`, lalu jalankan `flutter run`.
 
 ### Backend Laravel
 - [x] Migration `create_transactions_table` berhasil dijalankan tanpa error di test environment
@@ -1853,23 +1861,23 @@ Catatan blokir:
 - [x] Semua endpoint terproteksi mengembalikan 401 tanpa token
 
 ### Frontend Flutter
-- [ ] Aplikasi langsung ke HomeScreen jika token tersimpan, ke LoginScreen jika tidak (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Login berhasil menyimpan token dan berpindah ke HomeScreen (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Logout menghapus token dan kembali ke LoginScreen (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] HomeScreen menampilkan SummaryCard dan daftar transaksi bulan berjalan (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Ganti bulan memperbarui daftar dan ringkasan (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Pull-to-refresh memuat ulang data (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] FAB membuka FormScreen kosong (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Tap item transaksi membuka FormScreen dengan data prefill (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Swipe kiri → konfirmasi → hapus transaksi dari daftar (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Form menolak submit jika keterangan atau nominal kosong (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Semua error API ditampilkan sebagai SnackBar merah, bukan crash (kode dibuat, belum diverifikasi Flutter CLI)
+- [x] Aplikasi langsung ke HomeScreen jika token tersimpan, ke LoginScreen jika tidak (kode dibuat dan analyzer lulus)
+- [x] Login berhasil menyimpan token dan berpindah ke HomeScreen (kode dibuat dan analyzer lulus)
+- [x] Logout menghapus token dan kembali ke LoginScreen (kode dibuat dan analyzer lulus)
+- [x] HomeScreen menampilkan SummaryCard dan daftar transaksi bulan berjalan (kode dibuat dan analyzer lulus)
+- [x] Ganti bulan memperbarui daftar dan ringkasan (kode dibuat dan analyzer lulus)
+- [x] Pull-to-refresh memuat ulang data (kode dibuat dan analyzer lulus)
+- [x] FAB membuka FormScreen kosong (kode dibuat dan analyzer lulus)
+- [x] Tap item transaksi membuka FormScreen dengan data prefill (kode dibuat dan analyzer lulus)
+- [x] Swipe kiri → konfirmasi → hapus transaksi dari daftar (kode dibuat dan analyzer lulus)
+- [x] Form menolak submit jika keterangan atau nominal kosong (kode dibuat dan analyzer lulus)
+- [x] Semua error API ditampilkan sebagai SnackBar merah, bukan crash (kode dibuat dan analyzer lulus)
 
 ### Integrasi
-- [ ] Flutter dapat berkomunikasi dengan Laravel yang berjalan di `localhost:8000` (belum diuji karena Flutter CLI belum tersedia)
-- [ ] Data yang ditambah via Flutter langsung muncul setelah refresh (belum diuji karena Flutter CLI belum tersedia)
-- [ ] Nominal ditampilkan dalam format Rupiah (`Rp 25.000`) (kode dibuat, belum diverifikasi Flutter CLI)
-- [ ] Tanggal ditampilkan dalam format yang terbaca (`03 Juni 2026`) (kode dibuat, belum diverifikasi Flutter CLI)
+- [ ] Flutter dapat berkomunikasi dengan Laravel yang berjalan di `localhost:8000` (belum diuji karena belum ada device Android/iOS)
+- [ ] Data yang ditambah via Flutter langsung muncul setelah refresh (belum diuji karena belum ada device Android/iOS)
+- [x] Nominal ditampilkan dalam format Rupiah (`Rp 25.000`) (kode dibuat dan analyzer lulus)
+- [x] Tanggal ditampilkan dalam format yang terbaca (`03 Juni 2026`) (kode dibuat dan analyzer lulus)
 
 ---
 

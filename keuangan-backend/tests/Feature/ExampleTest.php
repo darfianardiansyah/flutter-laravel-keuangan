@@ -7,13 +7,10 @@ use Tests\TestCase;
 
 class ExampleTest extends TestCase
 {
-    /**
-     * A basic test example.
-     */
-    public function test_the_application_returns_a_successful_response(): void
+    public function test_api_login_validation_is_available(): void
     {
-        $response = $this->get('/');
-
-        $response->assertStatus(200);
+        $this->postJson('/api/login', [])
+            ->assertUnprocessable()
+            ->assertJsonValidationErrors(['email', 'password']);
     }
 }

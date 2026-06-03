@@ -1,0 +1,14 @@
+# Flutter generated files
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+android/app/src/main/java/io/flutter/plugins/GeneratedPluginRegistrant.java
+build/
+
+# Local machine configuration
+android/local.properties
+
+# Test and analysis cache
+.packages
+.pub-cache/
+.pub/

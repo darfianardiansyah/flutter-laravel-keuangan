@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import '../services/api_service.dart';
 import 'home_screen.dart';
 
+// Layar autentikasi untuk login dan register dalam satu form.
 class LoginScreen extends StatefulWidget {
   const LoginScreen({super.key});
 
@@ -28,6 +29,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   Future<void> _submit() async {
+    // Validasi ringan di sisi Flutter sebelum request dikirim ke API.
     if (_emailCtrl.text.trim().isEmpty || _passwordCtrl.text.isEmpty) {
       _showError('Email dan password wajib diisi.');
       return;
@@ -41,6 +43,7 @@ class _LoginScreenState extends State<LoginScreen> {
     setState(() => _loading = true);
 
     try {
+      // Mode form menentukan apakah user melakukan register atau login.
       if (_isRegister) {
         await _api.register(
           name: _nameCtrl.text.trim(),
@@ -55,6 +58,7 @@ class _LoginScreenState extends State<LoginScreen> {
       }
 
       if (!mounted) return;
+      // Setelah token tersimpan oleh ApiService, user masuk ke dashboard.
       Navigator.pushReplacement(
         context,
         MaterialPageRoute(builder: (_) => const HomeScreen()),
@@ -67,6 +71,7 @@ class _LoginScreenState extends State<LoginScreen> {
   }
 
   void _showError(String message) {
+    // Semua error auth ditampilkan sebagai SnackBar merah sesuai PRD.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
@@ -84,6 +89,7 @@ class _LoginScreenState extends State<LoginScreen> {
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.stretch,
                 children: [
+                  // Identitas visual sederhana untuk aplikasi keuangan.
                   const Icon(
                     Icons.account_balance_wallet_rounded,
                     color: Colors.indigo,
@@ -103,6 +109,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 28),
                   if (_isRegister) ...[
+                    // Field nama hanya muncul saat user memilih mode register.
                     TextField(
                       controller: _nameCtrl,
                       decoration: const InputDecoration(
@@ -134,6 +141,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 20),
                   FilledButton.icon(
+                    // Tombol submit ikut disable ketika request sedang berjalan.
                     onPressed: _loading ? null : _submit,
                     icon: _loading
                         ? const SizedBox(
@@ -146,6 +154,7 @@ class _LoginScreenState extends State<LoginScreen> {
                   ),
                   const SizedBox(height: 8),
                   TextButton(
+                    // Toggle mode menjaga layar tetap ringkas tanpa route terpisah.
                     onPressed: _loading
                         ? null
                         : () => setState(() => _isRegister = !_isRegister),

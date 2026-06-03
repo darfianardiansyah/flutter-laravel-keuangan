@@ -8,6 +8,7 @@ import '../widgets/transaction_tile.dart';
 import 'form_screen.dart';
 import 'login_screen.dart';
 
+// Dashboard utama untuk ringkasan bulanan dan daftar transaksi.
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
 
@@ -25,6 +26,7 @@ class _HomeScreenState extends State<HomeScreen> {
   double _balance = 0;
   bool _loading = true;
 
+  // Format query month yang diminta API Laravel: yyyy-MM.
   String get _monthParam => DateFormat('yyyy-MM').format(_selectedMonth);
 
   @override
@@ -37,6 +39,7 @@ class _HomeScreenState extends State<HomeScreen> {
     setState(() => _loading = true);
 
     try {
+      // Daftar transaksi dan summary dimuat paralel agar dashboard cepat muncul.
       final results = await Future.wait([
         _api.getTransactions(month: _monthParam),
         _api.getSummary(month: _monthParam),
@@ -52,6 +55,7 @@ class _HomeScreenState extends State<HomeScreen> {
     } catch (e) {
       _showError(e.toString().replaceFirst('Exception: ', ''));
       if (e.toString().contains('Sesi berakhir')) {
+        // Jika token expired, bersihkan session lokal dan arahkan ke login.
         await _goToLogin();
       }
     } finally {
@@ -60,6 +64,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _selectMonth() async {
+    // Date picker dipakai sebagai pemilih bulan; tanggalnya diabaikan.
     final picked = await showDatePicker(
       context: context,
       initialDate: _selectedMonth,
@@ -75,6 +80,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _openForm(Transaction? transaction) async {
+    // Null berarti tambah transaksi, object berarti edit transaksi.
     final changed = await Navigator.push<bool>(
       context,
       MaterialPageRoute(
@@ -83,12 +89,14 @@ class _HomeScreenState extends State<HomeScreen> {
     );
 
     if (changed == true) {
+      // Form mengirim true setelah create/update agar dashboard refresh.
       await _loadData();
     }
   }
 
   Future<void> _deleteTransaction(Transaction transaction) async {
     try {
+      // Delete dipanggil setelah konfirmasi dari TransactionTile.
       await _api.deleteTransaction(transaction.id);
       await _loadData();
     } catch (e) {
@@ -98,6 +106,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   Future<void> _logout() async {
     try {
+      // Logout server lalu hapus token lokal.
       await _api.logout();
       await _goToLogin();
     } catch (e) {
@@ -106,6 +115,7 @@ class _HomeScreenState extends State<HomeScreen> {
   }
 
   Future<void> _goToLogin() async {
+    // Menghapus seluruh jejak session lokal sebelum kembali ke login.
     await _api.clearToken();
     if (!mounted) return;
     Navigator.pushAndRemoveUntil(
@@ -117,6 +127,7 @@ class _HomeScreenState extends State<HomeScreen> {
 
   void _showError(String message) {
     if (!mounted) return;
+    // Semua error dashboard ditampilkan sebagai SnackBar merah.
     ScaffoldMessenger.of(context).showSnackBar(
       SnackBar(content: Text(message), backgroundColor: Colors.red),
     );
@@ -131,11 +142,13 @@ class _HomeScreenState extends State<HomeScreen> {
         title: const Text('Pencatat Keuangan'),
         actions: [
           IconButton(
+            // Shortcut filter bulan dari AppBar.
             onPressed: _selectMonth,
             icon: const Icon(Icons.calendar_month_outlined),
             tooltip: 'Pilih bulan',
           ),
           IconButton(
+            // Logout user aktif.
             onPressed: _logout,
             icon: const Icon(Icons.logout),
             tooltip: 'Logout',
@@ -143,10 +156,12 @@ class _HomeScreenState extends State<HomeScreen> {
         ],
       ),
       floatingActionButton: FloatingActionButton(
+        // FAB membuka form kosong untuk tambah transaksi.
         onPressed: () => _openForm(null),
         child: const Icon(Icons.add),
       ),
       body: RefreshIndicator(
+        // Pull-to-refresh memuat ulang transaksi dan summary.
         onRefresh: _loadData,
         child: ListView(
           padding: const EdgeInsets.all(16),
@@ -160,6 +175,7 @@ class _HomeScreenState extends State<HomeScreen> {
                   ),
                 ),
                 OutlinedButton.icon(
+                  // Tombol filter kedua agar aksi tetap mudah dijangkau.
                   onPressed: _selectMonth,
                   icon: const Icon(Icons.tune),
                   label: const Text('Filter'),
@@ -184,6 +200,7 @@ class _HomeScreenState extends State<HomeScreen> {
                 child: Center(child: Text('Belum ada transaksi bulan ini.')),
               )
             else
+              // Setiap transaksi bisa ditap untuk edit dan swipe untuk hapus.
               ..._transactions.map(
                 (transaction) => TransactionTile(
                   transaction: transaction,

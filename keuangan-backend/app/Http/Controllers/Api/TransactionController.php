@@ -44,6 +44,25 @@ class TransactionController extends Controller
         ]);
     }
 
+    public function statistics(Request $request): JsonResponse
+    {
+        $query = $request->user()->transactions();
+
+        if ($request->filled('month')) {
+            $query->forMonth($request->string('month')->toString());
+        }
+
+        $transactions = $query->get();
+
+        return response()->json([
+            'data' => [
+                'month' => $request->string('month')->toString() ?: null,
+                'income' => $this->categoryStatistics($transactions, 'income'),
+                'expense' => $this->categoryStatistics($transactions, 'expense'),
+            ],
+        ]);
+    }
+
     public function store(Request $request): JsonResponse
     {
         $transaction = $request->user()
@@ -97,5 +116,43 @@ class TransactionController extends Controller
             'date' => ['required', 'date'],
             'note' => ['nullable', 'string'],
         ]);
+    }
+
+    /**
+     * @param  \Illuminate\Support\Collection<int, Transaction>  $transactions
+     * @return array{total: float, categories: array<int, array{category: string, total: float, count: int, percentage: float}>}
+     */
+    private function categoryStatistics($transactions, string $type): array
+    {
+        $filtered = $transactions->where('type', $type);
+        $total = (float) $filtered->sum('amount');
+
+        if ($total <= 0) {
+            return [
+                'total' => 0.0,
+                'categories' => [],
+            ];
+        }
+
+        $categories = $filtered
+            ->groupBy('category')
+            ->map(function ($items, string $category) use ($total): array {
+                $categoryTotal = (float) $items->sum('amount');
+
+                return [
+                    'category' => $category,
+                    'total' => $categoryTotal,
+                    'count' => $items->count(),
+                    'percentage' => round(($categoryTotal / $total) * 100, 2),
+                ];
+            })
+            ->sortByDesc('total')
+            ->values()
+            ->all();
+
+        return [
+            'total' => $total,
+            'categories' => $categories,
+        ];
     }
 }

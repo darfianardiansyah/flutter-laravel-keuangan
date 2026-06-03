@@ -12,5 +12,6 @@ Route::middleware('auth:sanctum')->group(function () {
     Route::get('/me', [AuthController::class, 'me']);
 
     Route::get('/transactions/summary', [TransactionController::class, 'summary']);
+    Route::get('/transactions/statistics', [TransactionController::class, 'statistics']);
     Route::apiResource('transactions', TransactionController::class);
 });

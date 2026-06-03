@@ -90,9 +90,3 @@ http://192.168.1.10:8000/api
 - Ringkasan saldo, total pemasukan, dan total pengeluaran.
 - Validasi server untuk kepemilikan data per user.
 - Tampilan nominal Rupiah dan tanggal Indonesia.
-
-## Catatan Development
-
-- File rahasia seperti `.env`, private key, dan credential tidak masuk Git.
-- File kerja AI agent di `ai-workspace/` boleh masuk commit jika berisi konteks project yang relevan.
-- Setiap tahapan pekerjaan mengikuti `ai-workspace/CommitGuidelines.md`.

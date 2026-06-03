@@ -12,3 +12,7 @@ android/local.properties
 .packages
 .pub-cache/
 .pub/
+
+# IDE local settings
+.idea/
+*.iml

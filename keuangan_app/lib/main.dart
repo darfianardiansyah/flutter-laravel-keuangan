@@ -5,12 +5,14 @@ import 'package:shared_preferences/shared_preferences.dart';
 import 'screens/home_screen.dart';
 import 'screens/login_screen.dart';
 
+// Menyiapkan Flutter binding, format tanggal Indonesia, lalu menjalankan app.
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await initializeDateFormatting('id', null);
   runApp(const MyApp());
 }
 
+// Root widget aplikasi yang mengatur tema global dan layar awal.
 class MyApp extends StatelessWidget {
   const MyApp({super.key});
 
@@ -43,6 +45,7 @@ class _SplashDeciderState extends State<_SplashDecider> {
   }
 
   Future<void> _decide() async {
+    // Membaca token lokal untuk menentukan user langsung masuk Home atau Login.
     final prefs = await SharedPreferences.getInstance();
     final token = prefs.getString('token');
 

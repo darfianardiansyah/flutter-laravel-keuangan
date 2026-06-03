@@ -5,24 +5,30 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 import '../models/transaction.dart';
 
+// Service pusat untuk semua komunikasi Flutter ke Laravel API.
 class ApiService {
+  // Base URL Android emulator ke localhost komputer host.
   static const String baseUrl = 'http://10.0.2.2:8000/api';
 
+  // Mengambil token Bearer yang tersimpan agar session tetap login.
   Future<String?> getToken() async {
     final prefs = await SharedPreferences.getInstance();
     return prefs.getString('token');
   }
 
+  // Menyimpan token setelah login/register berhasil.
   Future<void> _saveToken(String token) async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.setString('token', token);
   }
 
+  // Menghapus token lokal saat logout atau session expired.
   Future<void> clearToken() async {
     final prefs = await SharedPreferences.getInstance();
     await prefs.remove('token');
   }
 
+  // Mendaftarkan user baru, lalu menyimpan token dari Laravel Sanctum.
   Future<void> register({
     required String name,
     required String email,
@@ -47,6 +53,7 @@ class ApiService {
     await _saveToken(body['token']);
   }
 
+  // Login user dan menyimpan token untuk request protected berikutnya.
   Future<void> login({
     required String email,
     required String password,
@@ -65,6 +72,7 @@ class ApiService {
     await _saveToken(body['token']);
   }
 
+  // Logout di server dan membersihkan token lokal.
   Future<void> logout() async {
     final response = await http.post(
       Uri.parse('$baseUrl/logout'),
@@ -78,6 +86,7 @@ class ApiService {
     await clearToken();
   }
 
+  // Mengambil daftar transaksi, optional difilter dengan format bulan yyyy-MM.
   Future<List<Transaction>> getTransactions({String? month}) async {
     final uri = Uri.parse('$baseUrl/transactions').replace(
       queryParameters: month == null ? null : {'month': month},
@@ -92,6 +101,7 @@ class ApiService {
         .toList();
   }
 
+  // Mengambil ringkasan saldo, pemasukan, dan pengeluaran dari API.
   Future<Map<String, double>> getSummary({String? month}) async {
     final uri = Uri.parse('$baseUrl/transactions/summary').replace(
       queryParameters: month == null ? null : {'month': month},
@@ -109,6 +119,7 @@ class ApiService {
     };
   }
 
+  // Membuat transaksi baru di server.
   Future<Transaction> createTransaction(Transaction transaction) async {
     final response = await http.post(
       Uri.parse('$baseUrl/transactions'),
@@ -124,6 +135,7 @@ class ApiService {
     return Transaction.fromJson(body['data']);
   }
 
+  // Mengubah transaksi yang sudah ada berdasarkan id.
   Future<Transaction> updateTransaction(
     int id,
     Transaction transaction,
@@ -140,6 +152,7 @@ class ApiService {
     return Transaction.fromJson(body['data']);
   }
 
+  // Menghapus transaksi berdasarkan id.
   Future<void> deleteTransaction(int id) async {
     final response = await http.delete(
       Uri.parse('$baseUrl/transactions/$id'),
@@ -149,11 +162,13 @@ class ApiService {
     _throwIfFailed(response.statusCode, _decode(response));
   }
 
+  // Header standar request JSON.
   Map<String, String> _headers() => {
         'Accept': 'application/json',
         'Content-Type': 'application/json',
       };
 
+  // Header request untuk endpoint yang membutuhkan Bearer Token.
   Future<Map<String, String>> _authHeaders() async {
     final token = await getToken();
     return {
@@ -162,6 +177,7 @@ class ApiService {
     };
   }
 
+  // Decode body JSON; response kosong dikembalikan sebagai map kosong.
   Map<String, dynamic> _decode(http.Response response) {
     if (response.body.isEmpty) {
       return {};
@@ -170,6 +186,7 @@ class ApiService {
     return jsonDecode(response.body) as Map<String, dynamic>;
   }
 
+  // Menyeragamkan error HTTP agar UI cukup menampilkan SnackBar.
   void _throwIfFailed(int statusCode, Map<String, dynamic> body) {
     if (statusCode >= 200 && statusCode < 300) {
       return;
@@ -186,6 +203,7 @@ class ApiService {
     throw Exception(_errorMessage(body));
   }
 
+  // Mengambil pesan validasi Laravel paling relevan untuk user.
   String _errorMessage(Map<String, dynamic> body) {
     final errors = body['errors'];
     if (errors is Map && errors.isNotEmpty) {

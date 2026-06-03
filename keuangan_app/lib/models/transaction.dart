@@ -1,3 +1,4 @@
+// Model data transaksi yang dipakai oleh UI dan API service.
 class Transaction {
   final int id;
   final String title;
@@ -17,6 +18,7 @@ class Transaction {
     this.note,
   });
 
+  // Mengubah response JSON Laravel menjadi object Transaction di Flutter.
   factory Transaction.fromJson(Map<String, dynamic> json) {
     final rawDate = json['date'].toString();
 
@@ -31,6 +33,7 @@ class Transaction {
     );
   }
 
+  // Mengubah Transaction menjadi JSON untuk request create/update ke API.
   Map<String, dynamic> toJson() => {
         'title': title,
         'amount': amount,
@@ -40,5 +43,6 @@ class Transaction {
         'note': note,
       };
 
+  // Membantu UI menentukan warna dan tanda nominal transaksi.
   bool get isIncome => type == 'income';
 }

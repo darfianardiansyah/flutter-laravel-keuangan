@@ -172,7 +172,7 @@ class _FormScreenState extends State<FormScreen> {
             ),
             const SizedBox(height: 12),
             DropdownButtonFormField<String>(
-              value: _categories.contains(_category)
+              initialValue: _categories.contains(_category)
                   ? _category
                   : _categories.first,
               decoration: const InputDecoration(
